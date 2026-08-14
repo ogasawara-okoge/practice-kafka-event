@@ -1,0 +1,10 @@
+# 各サブアプリの node_modules やビルド成果物
+**/node_modules/
+**/dist/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+*.log
+*.env
