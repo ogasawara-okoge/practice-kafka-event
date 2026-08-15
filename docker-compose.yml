@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # Kafka（メッセージブローカー）の定義
   kafka:
     image: confluentinc/cp-kafka:7.5.0
     container_name: kafka
@@ -22,3 +21,59 @@ services:
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
       CLUSTER_ID: 'Mk3OEYBSD3T24T8rKRMdww=='
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 29092 || exit 1"]
+      interval: 10s
+      timeout: 15s
+      retries: 15
+      start_period: 10s
+
+  kafka-setup:
+    image: confluentinc/cp-kafka:7.5.0
+    user: "root"    # ← これを追加（コンテナ内をrootで実行）
+    depends_on:
+      kafka:
+        condition: service_healthy
+    command: >
+      bash -c "
+      cub kafka-ready -b kafka:29092 1 20 &&
+      kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1 --topic order-events
+      "
+
+  shop:
+    build: ./shop
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./shop/.env.local
+    depends_on:
+      - order-api
+
+  order-api:
+    build: ./order-api
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./order-api/.env
+    command: npm run dev
+    depends_on:
+      kafka-setup:
+        condition: service_completed_successfully
+
+  order-processor:
+    build: ./order-processor
+    env_file:
+      - ./order-processor/.env
+    command: npm run dev
+    depends_on:
+      kafka-setup:
+        condition: service_completed_successfully
+
+  mail-service:
+    build: ./mail-service
+    env_file:
+      - ./mail-service/.env
+    command: npm run dev
+    depends_on:
+      kafka-setup:
+        condition: service_completed_successfully
