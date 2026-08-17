@@ -1,7 +1,15 @@
 FROM node:18-alpine
+
 WORKDIR /app
-COPY package*.json ./
+
+RUN apk add --no-cache protobuf
+
+COPY infrastructure /app/infrastructure
+
+COPY order-api/package*.json ./
 RUN npm install
-COPY . .
+
+COPY order-api/ .
+
 EXPOSE 3000
 CMD ["npm", "run", "dev"]
