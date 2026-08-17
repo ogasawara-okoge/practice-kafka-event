@@ -1,5 +1,6 @@
 import { Kafka } from 'kafkajs';
 import dotenv from 'dotenv';
+import { OrderCreatedEvent } from './generated/order.js';
 
 dotenv.config();
 
@@ -28,8 +29,7 @@ const run = async () => {
   await consumer.run({
     eachMessage: async ({ message }) => {
       if (!message.value) return;
-      
-      const order = JSON.parse(message.value.toString());
+      const order = OrderCreatedEvent.decode(message.value);
       console.log(`[Mail Service] 💌 注文メールを送信中...`);
       console.log(`宛先: 顧客, 内容: 商品「${order.item}」を ${order.quantity} 個受注しました。`);
       console.log(`[Mail Service] ✅ 送信完了! Order ID: ${order.orderId}`);

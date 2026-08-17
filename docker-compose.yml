@@ -89,9 +89,15 @@ services:
         condition: service_completed_successfully
 
   mail-service:
-    build: ./mail-service
+    build:
+      context: .
+      dockerfile: mail-service/Dockerfile
     env_file:
       - ./mail-service/.env
+    volumes:
+      - ./mail-service:/app
+      - /app/node_modules
+      - ./infrastructure:/infrastructure
     command: npm run dev
     depends_on:
       kafka-setup:

@@ -1,7 +1,9 @@
 FROM node:18-alpine
 WORKDIR /app
-COPY package*.json ./
+RUN apk add --no-cache protobuf
+COPY infrastructure /infrastructure
+COPY mail-service/package*.json ./
 RUN npm install
-COPY . .
+COPY mail-service/ .
 CMD ["npm", "run", "dev"]
 
