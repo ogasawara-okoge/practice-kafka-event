@@ -80,9 +80,15 @@ services:
         condition: service_completed_successfully
 
   order-processor:
-    build: ./order-processor
+    build: 
+      context: .
+      dockerfile: order-processor/Dockerfile
     env_file:
       - ./order-processor/.env
+    volumes:
+      - ./order-processor:/app
+      - /app/node_modules
+      - ./infrastructure:/infrastructure
     command: npm run dev
     depends_on:
       kafka-setup:

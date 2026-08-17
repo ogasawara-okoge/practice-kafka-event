@@ -1,5 +1,6 @@
 import { Kafka } from 'kafkajs';
 import dotenv from 'dotenv';
+import { OrderCreatedEvent } from './generated/order.js';
 
 dotenv.config();
 
@@ -31,10 +32,10 @@ const run = async () => {
     eachMessage: async ({ message }) => {
       if (!message.value) return;
 
-      const order = JSON.parse(message.value.toString());
+      const order = OrderCreatedEvent.decode(message.value);
       console.log(`[Order Processor] 📦 注文データをデータベースに保存中...`);
       // ここに保存処理
-      console.log(`[Order Processor] ✅ 保存完了: Order ID: ${order.orderId}`);
+      console.log(`[Order Processor] ✅ 保存完了: Order ID: ${order.orderId}, Order Item: ${order.item}`);
     },
   });
 };
