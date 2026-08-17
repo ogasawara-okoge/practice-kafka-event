@@ -28,9 +28,22 @@ services:
       retries: 15
       start_period: 10s
 
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.5.0
+    container_name: schema-registry
+    depends_on:
+      kafka:
+        condition: service_healthy
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka:29092'
+      SCHEMA_REGISTRY_LISTENERS: 'http://0.0.0.0:8081'
+
   kafka-setup:
     image: confluentinc/cp-kafka:7.5.0
-    user: "root"    # ← これを追加（コンテナ内をrootで実行）
+    user: "root"
     depends_on:
       kafka:
         condition: service_healthy
@@ -50,11 +63,17 @@ services:
       - order-api
 
   order-api:
-    build: ./order-api
+    build:
+      context: .
+      dockerfile: order-api/Dockerfile
     ports:
       - "3000:3000"
     env_file:
       - ./order-api/.env
+    volumes:
+      - ./order-api:/app
+      - /app/node_modules
+      - ./infrastructure:/app/infrastructure
     command: npm run dev
     depends_on:
       kafka-setup:
