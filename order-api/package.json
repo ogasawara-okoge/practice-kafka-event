@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "npm run generate-proto && tsx watch src/index.ts",
     "build": "npm run generate-proto && tsc",
-    "generate-proto": "protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=src/generated --ts_proto_opt=esModuleInterop=true -I/app/infrastructure/schema-registry /app/infrastructure/schema-registry/*.proto"
+    "generate-proto": "protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=src/generated --ts_proto_opt=esModuleInterop=true -I/infrastructure/schema-registry /infrastructure/schema-registry/*.proto"
   },
   "dependencies": {
     "@kafkajs/confluent-schema-registry": "^4.1.0",

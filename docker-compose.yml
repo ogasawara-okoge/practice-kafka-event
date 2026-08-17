@@ -73,7 +73,7 @@ services:
     volumes:
       - ./order-api:/app
       - /app/node_modules
-      - ./infrastructure:/app/infrastructure
+      - ./infrastructure:/infrastructure
     command: npm run dev
     depends_on:
       kafka-setup:

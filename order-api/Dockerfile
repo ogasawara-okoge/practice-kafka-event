@@ -4,7 +4,7 @@ WORKDIR /app
 
 RUN apk add --no-cache protobuf
 
-COPY infrastructure /app/infrastructure
+COPY infrastructure /infrastructure
 
 COPY order-api/package*.json ./
 RUN npm install
