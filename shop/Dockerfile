@@ -1,7 +1,8 @@
 FROM node:20-alpine
 WORKDIR /app
-COPY package*.json ./
+COPY infrastructure /infrastructure
+COPY shop/package*.json ./
 RUN npm install
-COPY . .
+COPY shop/ .
 EXPOSE 3001
 CMD ["npm", "run", "dev"]

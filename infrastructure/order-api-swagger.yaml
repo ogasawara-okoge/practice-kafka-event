@@ -1,0 +1,71 @@
+openapi: 3.0.3
+info:
+  title: Order API
+  version: 1.0.0
+paths:
+  /orders:
+    post:
+      summary: 注文の作成とKafkaへのイベント発行
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: 注文が正常に受け付けられ、イベントが発行された場合
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+components:
+  schemas:
+    CreateOrderRequest:
+      type: object
+      required:
+        - item
+        - quantity
+      properties:
+        item:
+          type: string
+          example: "Default Item"
+        quantity:
+          type: integer
+          example: 1
+
+    OrderDetails:
+      type: object
+      properties:
+        orderId:
+          type: string
+          example: "1723958400000"
+        item:
+          type: string
+          example: "Default Item"
+        quantity:
+          type: integer
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-08-18T04:00:00.000Z"
+
+    OrderResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Order received and event published!"
+        order:
+          $ref: '#/components/schemas/OrderDetails'

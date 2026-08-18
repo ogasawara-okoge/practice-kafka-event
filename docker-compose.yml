@@ -54,7 +54,9 @@ services:
       "
 
   shop:
-    build: ./shop
+    build:
+      context: .
+      dockerfile: shop/Dockerfile
     ports:
       - "3001:3001"
     env_file:

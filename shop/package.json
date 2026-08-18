@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3001",
+    "dev": "npm run generate-api && next dev -p 3001 ",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "generate-api": "orval"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
@@ -19,8 +20,10 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "axios": "^1.19.0",
     "eslint": "^9",
     "eslint-config-next": "16.3.1",
+    "orval": "^8.24.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
