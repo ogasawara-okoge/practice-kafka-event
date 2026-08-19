@@ -1,39 +1,39 @@
 'use client';
 
 import { useState } from 'react';
-import { CreateOrderRequest } from '../lib/generated/orderApi'
+import createClient from 'openapi-fetch';
+import type { paths, components } from '../lib/client/schema';
+
+const client = createClient<paths>({
+  baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
+});
+
+type OrderInput = components["schemas"]["OrderInput"];
 
 export default function Home() {
-  const [item, setItem] = useState('');
-  const [quantity, setQuantity] = useState(1);
   const [status, setStatus] = useState('');
-
+  const [formData, setFormData] = useState<OrderInput>({
+    item: '',
+    quantity: 1
+  });
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('送信中...');
-
-    const request: CreateOrderRequest = {
-      item,
-      quantity: Number(quantity) 
-    }
-
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
+      const { data, error } = await client.POST('/orders', {
+        body: formData,
       });
 
-      if (!res.ok) {
-                throw new Error('注文に失敗しました');
+      if (error || !data) {
+        console.error(error);
+        throw new Error('注文に失敗しました');
       }
 
-      const data = await res.json();
       setStatus(`✅ 注文成功！注文ID: ${data.order.orderId}`);
-      setItem('');
-      setQuantity(1);
+      setFormData({
+        item: '',
+        quantity: 1
+      });
     } catch (err) {
       console.error(err);
       setStatus('❌ エラーが発生しました');
@@ -49,8 +49,8 @@ export default function Home() {
             <label className="block text-sm font-medium mb-1">商品名</label>
             <input
               type="text"
-              value={item}
-              onChange={(e) => setItem(e.target.value)}
+              value={formData.item}
+              onChange={(e) => setFormData({ ...formData, item: e.target.value })}
               required
               className="w-full border rounded p-2"
               placeholder="例: コーヒー豆"
@@ -61,8 +61,8 @@ export default function Home() {
             <input
               type="number"
               min="1"
-              value={quantity}
-              onChange={(e) => setQuantity(Number(e.target.value))}
+              value={formData.quantity}
+              onChange={(e) => setFormData({ ...formData, quantity: Number(e.target.value) })}
               required
               className="w-full border rounded p-2"
             />
